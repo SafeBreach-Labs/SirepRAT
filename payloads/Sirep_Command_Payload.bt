@@ -1,0 +1,51 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: Sirep_Command_Payload.bt
+//   Authors: Dor Azouri
+//   Version: 1.0
+//   Purpose: Parse command packet payloads, of the Sirep/WPConProtocol2 protocol
+//  Category: Windows IoT Core
+//------------------------------------------------
+
+enum JOB_TYPE {
+    LaunchCommand = 0x0A,
+    GetSystemInformationFromDevice = 0x32,
+    GetFileFromDevice = 0x1E,
+    PutFileOnDevice = 0x14,
+    PutFileOnDevice2 = 0x17,
+    GetFileInformationFromDevice = 0x3C,
+    PipeClose = 0x18,
+    PipeClose2 = 0x28,
+} CommandType <bgcolor=cAqua>;
+
+int PayloadLength <bgcolor=cBlue>;
+if (CommandType == 0xA){ // LaunchCommand
+    int ReturnErrorFlag <bgcolor=cDkPurple>;
+    int ReturnOutputFlag <bgcolor=cDkPurple, comment="Can’t be set if error stream is not set">;
+    int ApplicationNameOffset <bgcolor=cDkGreen, comment="Calculated from start of payload (exluding first 2 ints). Should be > 24h = 36 = 9 ints that come before command line string">;
+    int ApplicationNameLength <bgcolor=cBlue, comment="In UNICODE bytes, not NULL terminated">;
+    int CommandLineOffset <bgcolor=cDkGreen>;
+    int CommandLineLength <bgcolor=cBlue>;
+    int BaseDirectoryOffset <bgcolor=cDkGreen>;
+    int BaseDirectoryLength <bgcolor=cBlue>;
+    int Seperator <bgcolor=cLtAqua>;
+    wchar_t ApplicationName[ApplicationNameLength/2] <bgcolor=cDkRed, comment="UNICODE, may include suffixes: <AS_LOGGED_ON_USER>, <WPCONDEV>">;
+    wchar_t CommandLine[CommandLineLength/2] <bgcolor=cDkGreen, comment="UNICODE">;
+    wchar_t BaseDirectory[BaseDirectoryLength/2] <bgcolor=cDkBlue, comment="UNICODE">;
+} else if (CommandType == 0x32) { // GetSystemInformationFromDevice
+    // no additional parameters needed
+} else if (CommandType == 0x1E) { // GetFileFromDevice
+    wchar_t FilePath[PayloadLength/2] <bgcolor=cDkGreen, comment="UNICODE">;
+} else if (CommandType == 0x14) { // PutFileOnDevice
+    // this template does not support multiple records (chucks) parsing
+    wchar_t FilePath[PayloadLength/2] <bgcolor=cDkGreen, comment="UNICODE">;
+    enum WRITE_RECORD_TYPE {
+        RegularChunk = 0x15,
+        LastChunk = 0x16,
+    } WriteRecordType <bgcolor=cAqua>;
+    int DataToWriteLength  <bgcolor=cBlue, comment="max chunk size=0x10000">;
+    wchar_t DataToWrite[DataToWriteLength/2] <bgcolor=cDkGreen, comment="UNICODE">;
+} else if (CommandType == 0x3C) { // GetFileInformationFromDevice
+    wchar_t FilePath[PayloadLength/2] <bgcolor=cDkGreen, comment="UNICODE">;
+}
