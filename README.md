@@ -12,7 +12,7 @@ Based on the findings we have extracted from this research about the service and
 It features an easy and intuitive user interface for sending commands to a Windows IoT Core target. It works on any cable-connected device running Windows IoT Core with an official Microsoft image.
 
 
-**The research white paper can be found** [**here**](https://safebreach.com/blog)
+**Slides and research White Paper are** [**in the docs folder**](https://github.com/SafeBreach-Labs/SirepRAT/tree/master/docs)
 
 
 ## Usage
