@@ -56,7 +56,7 @@ python SirepRAT.py --help
 
 ## Authors
 
-**Dor Azouri** (@bemikre)
+**Dor Azouri** ([@bemikre](https://twitter.com/bemikre))
 
 ## License
 
