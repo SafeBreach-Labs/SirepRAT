@@ -21,7 +21,7 @@ Slides and research White Paper are [**in the docs folder**](https://github.com/
 
 #### Download File
 ```bash
-python SirepRAT.py 192.168.3.17 GetFileFromDevice --remote_path "C:\Windows\System32\drivers\etc\hosts" -v
+python SirepRAT.py 192.168.3.17 GetFileFromDevice --remote_path "C:\Windows\System32\drivers\etc\hosts" --v
 ```
 
 #### Upload File
