@@ -16,6 +16,10 @@ It features an easy and intuitive user interface for sending commands to a Windo
 
 Slides and research White Paper are [**in the docs folder**](https://github.com/SafeBreach-Labs/SirepRAT/tree/master/docs)
 
+## Setup
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
