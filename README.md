@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/Dy5wL42WoAEROGq.jpg" alt="SirepRAT" width="300"></p>
+
 # SirepRAT - RCE as SYSTEM on Windows IoT Core
 **SirepRAT** Features full RAT capabilities without the need of writing a real RAT malware on target.
 
