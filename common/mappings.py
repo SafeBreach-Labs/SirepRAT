@@ -49,7 +49,7 @@ def _load_sirep_commands(module, base_class, type_enum, suffix_length):
     _sirep_commands = {}
     for symbol_name in dir(module):
         symbol = getattr(module, symbol_name)
-        if not isinstance(symbol, (type, types.ClassType)):
+        if not isinstance(symbol, type):
             continue
         # fill only classes that derive from given base class
         if issubclass(symbol, base_class) and \
