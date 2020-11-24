@@ -35,13 +35,13 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-08-19 08:03:08
 """
 
-from ErrorStreamResult import ErrorStreamResult
-from FileInformationResult import FileInformationResult
-from FileResult import FileResult
-from HResultResult import HResultResult
-from OutputStreamResult import OutputStreamResult
-from SirepResult import SirepResult
-from SystemInformationResult import SystemInformationResult
+from .ErrorStreamResult import ErrorStreamResult
+from .FileInformationResult import FileInformationResult
+from .FileResult import FileResult
+from .HResultResult import HResultResult
+from .OutputStreamResult import OutputStreamResult
+from .SirepResult import SirepResult
+from .SystemInformationResult import SystemInformationResult
 
 __all__ = [
     "SirepResult",

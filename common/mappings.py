@@ -38,8 +38,8 @@ Date:       2018-02-04 08:03:08
 
 import types
 
-from enums.CommandType import CommandType
-from enums.ResultRecordType import ResultRecordType
+from .enums.CommandType import CommandType
+from .enums.ResultRecordType import ResultRecordType
 from models import commands
 from models import results
 

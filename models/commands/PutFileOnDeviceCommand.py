@@ -39,7 +39,7 @@ Date:       2018-02-04 08:03:08
 import struct
 
 import common.utils as utils
-from SirepCommand import SirepCommand
+from .SirepCommand import SirepCommand
 from common.enums.CommandType import CommandType
 from common.constants import INT_SIZE
 from common.enums.WriteRecordType import WriteRecordType

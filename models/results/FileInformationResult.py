@@ -39,7 +39,7 @@ Date:       2018-02-04 08:03:08
 import struct
 
 import common.utils as utils
-from SirepResult import SirepResult
+from .SirepResult import SirepResult
 from common.constants import FILE_INFORMATION_SIZE
 
 

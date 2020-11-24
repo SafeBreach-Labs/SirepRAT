@@ -35,12 +35,12 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-08-19 08:03:08
 """
 
-from GetFileFromDeviceCommand import GetFileFromDeviceCommand
-from GetFileInformationFromDeviceCommand import GetFileInformationFromDeviceCommand
-from GetSystemInformationFromDeviceCommand import GetSystemInformationFromDeviceCommand
-from LaunchCommandWithOutputCommand import LaunchCommandWithOutputCommand
-from PutFileOnDeviceCommand import PutFileOnDeviceCommand
-from SirepCommand import SirepCommand
+from .GetFileFromDeviceCommand import GetFileFromDeviceCommand
+from .GetFileInformationFromDeviceCommand import GetFileInformationFromDeviceCommand
+from .GetSystemInformationFromDeviceCommand import GetSystemInformationFromDeviceCommand
+from .LaunchCommandWithOutputCommand import LaunchCommandWithOutputCommand
+from .PutFileOnDeviceCommand import PutFileOnDeviceCommand
+from .SirepCommand import SirepCommand
 
 __all__ = [
     "SirepCommand",
