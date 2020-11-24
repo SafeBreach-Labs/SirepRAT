@@ -95,7 +95,7 @@ def sirep_connect(sock, dst_ip, verbose=False):
     version_guid_banner = sock.recv(SIREP_VERSION_GUID_LEN)
     logging.info('Banner hex: %s' % version_guid_banner)
     if verbose:
-        print "RECV:"
+        print("RECV:")
         hexdump.hexdump(version_guid_banner)
 
 
@@ -104,7 +104,7 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
     sirep_payload = sirep_command.serialize_sirep()
     logging.info('Sirep payload hex: %s' % sirep_payload.encode('hex'))
     if verbose:
-        print "SEND:"
+        print("SEND:")
         hexdump.hexdump(sirep_payload)
 
     # Send the Sirep payload
@@ -130,13 +130,13 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
 
             logging.info("Result record data hex: %s" % data[:LOGGING_DATA_TRUNCATION].encode('hex'))
             if verbose:
-                print "RECV:"
+                print("RECV:")
                 hexdump.hexdump(data)
 
             # If printable, print result record data as is
             if print_printable_data and all([x in string.printable for x in data]):
                 logging.info("Result data readable print:")
-                print "---------\n%s\n---------" % data
+                print("---------\n%s\n---------" % data)
             records.append(first_int + data)
         except socket.timeout as e:
             logging.debug("timeout in command communication. Assuming end of conversation")
@@ -176,7 +176,7 @@ def main(args):
             result_type_code = struct.unpack("I", result_buffer[:INT_SIZE])[0]
             sirep_result_ctor = RESULT_TYPE_TO_RESULT[result_type_code]
             sirep_result = sirep_result_ctor(result_buffer)
-            print sirep_result
+            print(sirep_result)
             sirep_results.append(sirep_result)
     finally:
         logging.debug("Closing socket")
@@ -224,7 +224,7 @@ if "__main__" == __name__:
                         help="Verbose - if printable, print result")
     parser.add_argument('--vv', action='store_true', default=False,
                         help="Very verbose - print socket buffers and more")
-    
+
     args = parser.parse_args()
 
     if args.command_type == CommandType.LaunchCommandWithOutput.name:
