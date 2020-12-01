@@ -66,4 +66,4 @@ python SirepRAT.py --help
 
 ## License
 
-[BSD 3](https://github.com/SafeBreach-Labs/AltFS/blob/master/LICENSE) - clause "New" or "Revised" License
+[BSD 3](https://github.com/SafeBreach-Labs/SirepRAT/blob/master/LICENSE) - clause "New" or "Revised" License
