@@ -41,7 +41,6 @@ import argparse
 import logging
 import socket
 import string
-import struct
 import sys
 
 import hexdump
@@ -50,6 +49,7 @@ from common.constants import SIREP_VERSION_GUID_LEN, LOGGING_FORMAT, LOGGING_LEV
     LOGGING_DATA_TRUNCATION
 from common.enums.CommandType import CommandType
 from common.mappings import SIREP_COMMANDS, RESULT_TYPE_TO_RESULT
+from common.utils import unpack_uint
 
 # Initialize logging
 logging.basicConfig(format=LOGGING_FORMAT, level=LOGGING_LEVEL)
@@ -116,13 +116,13 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
     records = []
     while True:
         try:
-            first_int = sirep_con_sock.recv(0x4)
-            if first_int == '':
+            first_int = sirep_con_sock.recv(INT_SIZE)
+            if not first_int:
                 break
-            result_record_type = int(struct.unpack("I", first_int)[0])
+            result_record_type = unpack_uint(first_int)
             logging.debug("Result record type: %d" % result_record_type)
-            data_size = int(struct.unpack("I", sirep_con_sock.recv(0x4))[0])
-            if data_size == 0:
+            data_size = unpack_uint(sirep_con_sock.recv(INT_SIZE))
+            if not data_size:
                 break
 
             logging.debug("Receiving %d bytes" % data_size)
@@ -173,7 +173,7 @@ def main(args):
 
         sirep_results = []
         for result_buffer in sirep_result_buffers:
-            result_type_code = struct.unpack("I", result_buffer[:INT_SIZE])[0]
+            result_type_code = unpack_uint(result_buffer[:INT_SIZE])
             sirep_result_ctor = RESULT_TYPE_TO_RESULT[result_type_code]
             sirep_result = sirep_result_ctor(result_buffer)
             print(sirep_result)

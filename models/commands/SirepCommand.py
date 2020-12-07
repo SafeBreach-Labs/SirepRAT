@@ -36,9 +36,10 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
 from pprint import pformat
 
+from common.constants import INT_SIZE
+import common.utils as utils
 
 class SirepCommand(object):
     """Base class for all Sirep commands"""
@@ -58,7 +59,7 @@ class SirepCommand(object):
 
         Serialization is done according to the Sirep protocol.
         """
-        return struct.pack("II", self.command_type.value, self.payload_length)
+        return utils.pack_uints(self.command_type.value, self.payload_length)
 
     @staticmethod
     def deserialize_sirep(self, command_buffer):
@@ -67,7 +68,7 @@ class SirepCommand(object):
 
         Instances are built from the given binary command buffer.
         """
-        command_type, payload_length = struct.unpack("II", command_buffer)
+        command_type, payload_length = utils.unpack_uints(command_buffer[:2*INT_SIZE])
         return SirepCommand(command_type)
 
     def __repr__(self):

@@ -36,8 +36,6 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
-
 import common.utils as utils
 from .SirepCommand import SirepCommand
 from common.constants import TRUE_FLAG_STRINGS, INT_SIZE
@@ -47,9 +45,7 @@ from common.enums.CommandType import CommandType
 class LaunchCommandWithOutputCommand(SirepCommand):
     """Concrete implementation of the LaunchCommandWithOutput command"""
 
-    COMMAND_LINE_OFFSET = 0x24
-    SEPERATOR_OFFSET = 0x28
-    HEADERS_LENGTH = 0x9
+    HEADER_SIZE = 4 * INT_SIZE
     IMPERSONATE_LOGGED_ON_USER_PREFIX = "<AS_LOGGED_ON_USER>"
 
     def __init__(self,
@@ -78,40 +74,23 @@ class LaunchCommandWithOutputCommand(SirepCommand):
 
         The payload length for this command type is the unicode length of the remote path.
         """
-        return len(self.command_line_string) * 2 + \
-               len(self.parameters_string) * 2 + \
-               len(self.base_directory_path) + LaunchCommandWithOutputCommand.HEADERS_LENGTH * INT_SIZE
+        return sum(self.HEADER_SIZE,
+                7*INT_SIZE, # string array table with offset+length for all three strings
+                2*len(self.command_line_string),
+                2*len(self.parameters_string),
+                2*len(self.base_directory_path),
+                )
 
     def serialize_sirep(self):
         """Described in parent class"""
-        serialized = ""
-        serialized += struct.pack("II", self.command_type.value, self.payload_length)
-        serialized += struct.pack("II", self.return_error_flag, self.return_output_flag)
-        command_line_offset = LaunchCommandWithOutputCommand.COMMAND_LINE_OFFSET
-        serialized += struct.pack("II", command_line_offset, len(self.command_line_string) * 2)
-        parameters_offset = command_line_offset + len(self.command_line_string) * 2
-        serialized += struct.pack("II", parameters_offset, len(self.parameters_string) * 2)
-        base_directory_path_offset = parameters_offset + len(self.parameters_string) * 2
-        serialized += struct.pack("II", base_directory_path_offset, len(self.base_directory_path) * 2)
-        serialized += struct.pack("I", 0)
-        serialized += utils.pack_string(self.command_line_string)
-        serialized += utils.pack_string(self.parameters_string)
-        serialized += utils.pack_string(self.base_directory_path)
-        serialized
-        return serialized
+        return b''.join((
+            utils.pack_uints(self.command_type.value, self.payload_length, self.return_error_flag, self.return_output_flag),
+            utils.pack_string_array(self.command_line_string, self.parameters_string, self.base_directory_path),
+            ))
 
     @staticmethod
     def deserialize_sirep(self, command_buffer):
         """Described in parent class"""
-        command_type, payload_length = struct.unpack("II", command_buffer[:8])
-        return_error_flag, return_output_flag = struct.unpack("II", command_buffer[8:16])
-        command_line_offset, command_line_length = struct.unpack("II", command_buffer[16:24])
-        parameters_offset, parameters_length = struct.unpack("II", command_buffer[24:32])
-        base_directory_offset, base_directory_length = struct.unpack("II", command_buffer[32:40])
-        command_line_offset = LaunchCommandWithOutputCommand.SEPERATOR_OFFSET + INT_SIZE
-        command_line_string = utils.unpack_string(command_buffer[44:])
-        parameters_offset = command_line_offset + INT_SIZE + len(command_line_string) * 2
-        parameters_string = utils.unpack_string(command_buffer[parameters_offset:])
-        base_directory_offset = parameters_offset + INT_SIZE + len(parameters_string) * 2
-        base_directory_path = utils.unpack_string(command_buffer[base_directory_offset:])
+        command_type, payload_length, return_error_flag, return_output_flag = utils.unpack_uints(command_buffer[:self.HEADER_SIZE])
+        command_line_string, parameters_string, base_directory_path = utils.unpack_string_array(command_buffer[self.HEADER_SIZE:])
         raise NotImplementedError()

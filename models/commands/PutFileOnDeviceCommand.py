@@ -36,8 +36,6 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
-
 import common.utils as utils
 from .SirepCommand import SirepCommand
 from common.enums.CommandType import CommandType
@@ -58,16 +56,17 @@ class PutFileOnDeviceCommand(SirepCommand):
         return len(self.remote_path) * 2
 
     def serialize_sirep(self):
-        serialized = ""
-        serialized += struct.pack("II", self.command_type.value, self.payload_length)
-        serialized += utils.pack_string(self.remote_path)
-        serialized += struct.pack("II", self.write_record_type.value, self.data_length)
-        serialized += utils.pack_string(self.data)
-        return serialized
+        """Described in parent class"""
+        return b''.join((
+            utils.pack_uint(self.command_type.value),
+            utils.pack_string(self.remote_path),
+            utils.pack_uint(self.write_record_type.value),
+            utils.pack_string(self.data),
+            ))
 
     @staticmethod
     def deserialize_sirep(self, command_buffer):
-        command_type, payload_length = struct.unpack("II", command_buffer[:INT_SIZE * 2])
-        remote_path = utils.unpack_string(command_buffer[INT_SIZE * 2:])
-        data = utils.unpack_string(command_buffer[INT_SIZE * 2 + INT_SIZE + len(remote_path) * 2:])
+        command_type, payload_length = utils.unpack_uints(command_buffer[:2*INT_SIZE])
+        remote_path = utils.unpack_string(command_buffer[2*INT_SIZE:])
+        data = utils.unpack_string(command_buffer[2*INT_SIZE + INT_SIZE + 2*len(remote_path):])
         return PutFileOnDeviceCommand(remote_path, data)

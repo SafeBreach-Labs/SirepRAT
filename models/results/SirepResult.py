@@ -36,7 +36,6 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
 from pprint import pformat
 
 import common.utils as utils
@@ -48,7 +47,7 @@ class SirepResult(object):
 
     def __init__(self, raw_data, data_size=None):
         """Initializes the result buffer representation"""
-        result_type = struct.unpack("I", raw_data[:INT_SIZE])[0]
+        result_type = utils.unpack_uint(raw_data[:INT_SIZE])
         result_payload = utils.unpack_bytes(raw_data[INT_SIZE:], data_size=data_size)
         self.result_type = result_type
         self.payload_length = len(result_payload)

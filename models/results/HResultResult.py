@@ -36,10 +36,9 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
-
 from .SirepResult import SirepResult
 from common.constants import INT_SIZE
+import common.utils as utils
 
 
 class HResultResult(SirepResult):
@@ -55,7 +54,7 @@ class HResultResult(SirepResult):
         """Described in parent class"""
         kv = super(HResultResult,
                    HResultResult)._parse_payload_to_kv(result_payload)
-        kv['HResult'] = struct.unpack("I", result_payload[:INT_SIZE])[0]
+        kv['HResult'] = utils.unpack_uint(result_payload[:INT_SIZE])
         return kv
 
     def __str__(self):
