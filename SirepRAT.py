@@ -93,7 +93,7 @@ def sirep_connect(sock, dst_ip, verbose=False):
     sock.connect(server_address)
     # Receive the server version GUID that acts as the service banner
     version_guid_banner = sock.recv(SIREP_VERSION_GUID_LEN)
-    logging.info('Banner hex: %s' % version_guid_banner)
+    logging.info('Banner hex: %s' % version_guid_banner.hex())
     if verbose:
         print("RECV:")
         hexdump.hexdump(version_guid_banner)
@@ -102,7 +102,7 @@ def sirep_connect(sock, dst_ip, verbose=False):
 def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False, verbose=False):
     # generate the commands's payload
     sirep_payload = sirep_command.serialize_sirep()
-    logging.info('Sirep payload hex: %s' % sirep_payload.encode('hex'))
+    logging.info('Sirep payload hex: %s' % sirep_payload.hex())
     if verbose:
         print("SEND:")
         hexdump.hexdump(sirep_payload)
@@ -128,15 +128,20 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
             logging.debug("Receiving %d bytes" % data_size)
             data = sirep_con_sock.recv(data_size)
 
-            logging.info("Result record data hex: %s" % data[:LOGGING_DATA_TRUNCATION].encode('hex'))
+            logging.info("Result record data hex: %s" % data[:LOGGING_DATA_TRUNCATION].hex())
             if verbose:
                 print("RECV:")
                 hexdump.hexdump(data)
 
             # If printable, print result record data as is
-            if print_printable_data and all([x in string.printable for x in data]):
-                logging.info("Result data readable print:")
-                print("---------\n%s\n---------" % data)
+            if print_printable_data:
+                try:
+                    data_string = data.decode()
+                    logging.info("Result data readable print:")
+                    print("---------\n%s\n---------" % data)
+                except UnicodeError:
+                    pass
+
             records.append(first_int + data)
         except socket.timeout as e:
             logging.debug("timeout in command communication. Assuming end of conversation")
