@@ -138,7 +138,7 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
                 try:
                     data_string = data.decode()
                     logging.info("Result data readable print:")
-                    print("---------\n%s\n---------" % data)
+                    print("---------\n%s\n---------" % data_string)
                 except UnicodeError:
                     pass
 
@@ -176,13 +176,12 @@ def main(args):
         sirep_result_buffers = sirep_send_command(sock, sirep_command, print_printable_data=args.v or args.vv,
                                                   verbose=args.vv)
 
-        sirep_results = []
         for result_buffer in sirep_result_buffers:
             result_type_code = unpack_uint(result_buffer[:INT_SIZE])
             sirep_result_ctor = RESULT_TYPE_TO_RESULT[result_type_code]
             sirep_result = sirep_result_ctor(result_buffer)
             print(sirep_result)
-            sirep_results.append(sirep_result)
+
     finally:
         logging.debug("Closing socket")
         sock.close()

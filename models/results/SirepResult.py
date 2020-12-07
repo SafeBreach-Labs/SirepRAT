@@ -59,14 +59,8 @@ class SirepResult(object):
         """Returns the parsed result data, parsed into a dictionary"""
         return {}
 
-    def _get_payload_peek(self, size=20):
-        payload_peek = ""
-        if len(self.result_payload) > 0:
-            if len(self.result_payload) > size:
-                payload_peek = self.result_payload[:size]
-            else:
-                payload_peek = self.result_payload
-        return payload_peek.replace("\n", "").replace("\r", "")
+    def _get_payload_peek(self, size=50):
+        return self.result_payload[:size]
 
     def get_result_type(self):
         """Returns the result type (type ResultRecordType)"""
