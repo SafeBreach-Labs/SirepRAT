@@ -67,6 +67,6 @@ class PutFileOnDeviceCommand(SirepCommand):
     @staticmethod
     def deserialize_sirep(self, command_buffer):
         command_type, payload_length = utils.unpack_uints(command_buffer[:2*INT_SIZE])
-        remote_path = utils.unpack_string(command_buffer[2*INT_SIZE:])
-        data = utils.unpack_string(command_buffer[2*INT_SIZE + INT_SIZE + 2*len(remote_path):])
+        remote_path, data = utils.unpack_strings(command_buffer[2*INT_SIZE:])
         return PutFileOnDeviceCommand(remote_path, data)
+

@@ -110,8 +110,32 @@ def unpack_string(data):
     if len(data) < INT_SIZE:
         return ''
 
-    string_length = unpack_uint(data[:INT_SIZE])
-    return data[INT_SIZE:INT_SIZE + string_length].decode('utf-16le')
+    length = unpack_uint(data[:INT_SIZE])
+    return data[INT_SIZE:INT_SIZE+length].decode(SIREP_ENCODING)
+
+
+def unpack_strings(data):
+    """
+    Returns a tuple of multiple strings found in the data.
+    """
+    strings = []
+    start, end = 0, INT_SIZE
+
+    while end < len(data):
+        length = unpack_uint(data[start:end])
+
+        if length < 1:
+            break
+
+        start, end = end, end+length
+
+        if end > len(data):
+            break
+
+        strings.append(data[start:end].decode(SIREP_ENCODING))
+        start, end = end, end+INT_SIZE
+
+    return tuple(strings)
 
 
 def unpack_string_array(data):
