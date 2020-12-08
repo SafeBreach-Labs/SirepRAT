@@ -74,7 +74,7 @@ class LaunchCommandWithOutputCommand(SirepCommand):
 
         The payload length for this command type is the unicode length of the remote path.
         """
-        return sum(self.HEADER_SIZE,
+        return sum(2*INT_SIZE, # return flags
                 7*INT_SIZE, # string array table with offset+length for all three strings
                 2*len(self.command_line_string),
                 2*len(self.parameters_string),

@@ -46,6 +46,9 @@ EPOCH_FILETIME = 116444736000000000
 HUNDRED_NANOSECONDS = 10000000
 
 
+SIREP_ENCODING = 'utf-16le'
+
+
 def pack_uint(uint):
     return struct.pack('I', uint)
 
@@ -60,7 +63,7 @@ def pack_string(string):
 
     Sirep encodes strings in UTF-16 little endian, with a 4-byte unsigned integer in front.
     """
-    encoded_string = string.encode('utf-16le')
+    encoded_string = string.encode(SIREP_ENCODING)
     return struct.pack("I%ss" % len(encoded_string), len(encoded_string), encoded_string)
 
 
@@ -71,7 +74,7 @@ def pack_string_array(*strings):
     2. The unsigned integer 0
     3. All strings concatenated
     """
-    encoded_strings = [s.encode('utf-16le') for s in strings]
+    encoded_strings = [s.encode(SIREP_ENCODING) for s in strings]
 
     table = []
     # first offset is after the table, i.e. 2 integers for each string and the zero
@@ -120,7 +123,7 @@ def unpack_string_array(data):
         if offset == 0:
             break
 
-        strings.append(data[offset:offset + length])
+        strings.append(data[offset:offset+length].decode(SIREP_ENCODING))
 
     return tuple(strings)
 
@@ -150,4 +153,5 @@ def windows_filetime_to_string(windows_filetime_low, windows_filetime_high):
 
 def windows_low_high_to_int(windows_int_low, windows_int_high):
     """Returns an int given the low and high integers"""
-    return (windows_int_high << 32) + windows_int_low
+    return (windows_int_high << 33) + windows_int_low
+
