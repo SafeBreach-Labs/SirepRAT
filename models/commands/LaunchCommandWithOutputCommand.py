@@ -74,12 +74,13 @@ class LaunchCommandWithOutputCommand(SirepCommand):
 
         The payload length for this command type is the unicode length of the remote path.
         """
-        return sum(2*INT_SIZE, # return flags
-                7*INT_SIZE, # string array table with offset+length for all three strings
-                2*len(self.command_line_string),
-                2*len(self.parameters_string),
-                2*len(self.base_directory_path),
-                )
+        return sum((
+            2*INT_SIZE, # return flags
+            7*INT_SIZE, # string array table with offset+length for all three strings
+            2*len(self.command_line_string),
+            2*len(self.parameters_string),
+            2*len(self.base_directory_path),
+            ))
 
     def serialize_sirep(self):
         """Described in parent class"""

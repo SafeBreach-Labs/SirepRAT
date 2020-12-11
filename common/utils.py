@@ -78,7 +78,7 @@ def pack_string_array(*strings):
 
     table = []
     # first offset is after the table, i.e. 2 integers for each string and the zero
-    offset = (2 * len(encoded_strings) + 1) * INT_SIZE
+    offset = (2 * len(encoded_strings) + 3) * INT_SIZE
 
     for length in map(len, encoded_strings):
         table += [offset, length]
