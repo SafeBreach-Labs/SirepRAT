@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="sireprat-dorazouri", # Replace with your own username
-    version="1.0.0",
+    version="2.0.0",
     author="Dor Azouri",
     author_email="dorazouri@gmail.com",
     description="Remote Command Execution as SYSTEM on Windows IoT Core - \
