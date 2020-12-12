@@ -28,5 +28,5 @@ setuptools.setup(
         "Topic :: System :: System Shells",
         "Topic :: Utilities",
     ],
-    python_requires='=2.7',
+    python_requires='==2.7',
 )
