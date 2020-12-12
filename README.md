@@ -60,9 +60,13 @@ python SirepRAT.py 192.168.3.17 GetFileInformationFromDevice --remote_path "C:\W
 python SirepRAT.py --help
 ```
 
-## Authors
+## Author
 
 **Dor Azouri** ([@bemikre](https://twitter.com/bemikre))
+
+## Contributors
+
+**movatica** ([@movatica](https://github.com/movatica)) - porting to python 3! (at the finish line of 2020)
 
 ## License
 
