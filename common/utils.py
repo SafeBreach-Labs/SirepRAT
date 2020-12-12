@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -39,52 +39,127 @@ Date:       2018-02-04 08:03:08
 import struct
 from datetime import datetime
 
-from common.constants import MOUSTACHE_PREFIX, MOUSTACHE_SUFFIX
+from common.constants import INT_SIZE, MOUSTACHE_PREFIX, MOUSTACHE_SUFFIX
 
 # http://support.microsoft.com/kb/167296
 EPOCH_FILETIME = 116444736000000000
 HUNDRED_NANOSECONDS = 10000000
 
 
-def string_to_unicode(string_):
-    """Converts a given ASCII string to unicode"""
-    return "".join([c.ljust(2, "\x00") for c in string_])
+SIREP_ENCODING = 'utf-16le'
 
 
-def pack_string(string_):
+def pack_uint(uint):
+    return struct.pack('I', uint)
+
+
+def pack_uints(*uints):
+    return struct.pack('I'*len(uints), *uints)
+
+
+def pack_string(string):
     """
     Returns given string, binary packed according to the Sirep protocol.
 
-    The given ASCII string is converted to the Sirep compatible struct:
-    -------------------------------------------------
-    |		Integer		|		Unicode bytes		|
-    -------------------0x4-------------------------len
-    |	length in bytes	|		Unicode chars		|
-    -------------------------------------------------
+    Sirep encodes strings in UTF-16 little endian, with a 4-byte unsigned integer in front.
     """
-    return struct.pack("%ss" % (len(string_) * 2), string_to_unicode(string_))
+    encoded_string = string.encode(SIREP_ENCODING)
+    return struct.pack("I%ss" % len(encoded_string), len(encoded_string), encoded_string)
+
+
+def pack_string_array(*strings):
+    """
+    An array of strings is packed the following way:
+    1. A table with the offset and length of each string as 4-byte unsigned integers
+    2. The unsigned integer 0
+    3. All strings concatenated
+    """
+    encoded_strings = [s.encode(SIREP_ENCODING) for s in strings]
+
+    table = []
+    # first offset is after the table, i.e. 2 integers for each string and the zero
+    offset = (2 * len(encoded_strings) + 3) * INT_SIZE
+
+    for length in map(len, encoded_strings):
+        table += [offset, length]
+        offset += length
+
+    # add the zero
+    table += [0]
+
+    # return the packed table plus the concatenated encoded strings
+    return pack_uints(*table) + b''.join(encoded_strings)
+
+
+def unpack_uint(data):
+    return struct.unpack('I', data)[0]
+
+
+def unpack_uints(data):
+    count = len(data) // INT_SIZE
+
+    return struct.unpack('I'*count, data)
 
 
 def unpack_string(data):
     """
-    Returns the packed string as an ASCII string.
+    Returns the packed string as UTF-8 string.
 
     Unpacks a binary packed string from a Sirep protocol buffer.
     """
-    if len(data) < 4:
-        return ""
-    string_size = struct.unpack("I", data[:4])[0]
-    return struct.unpack("%ss" % string_size, data[4:4 + string_size])[0].replace("\x00", "")
+    if len(data) < INT_SIZE:
+        return ''
+
+    length = unpack_uint(data[:INT_SIZE])
+    return data[INT_SIZE:INT_SIZE+length].decode(SIREP_ENCODING)
+
+
+def unpack_strings(data):
+    """
+    Returns a tuple of multiple strings found in the data.
+    """
+    strings = []
+    start, end = 0, INT_SIZE
+
+    while end < len(data):
+        length = unpack_uint(data[start:end])
+
+        if length < 1:
+            break
+
+        start, end = end, end+length
+
+        if end > len(data):
+            break
+
+        strings.append(data[start:end].decode(SIREP_ENCODING))
+        start, end = end, end+INT_SIZE
+
+    return tuple(strings)
+
+
+def unpack_string_array(data):
+    strings = []
+
+    for header in data[::INT_SIZE*2]:
+        offset, length = unpack_uints(header)
+
+        if offset == 0:
+            break
+
+        strings.append(data[offset:offset+length].decode(SIREP_ENCODING))
+
+    return tuple(strings)
 
 
 def unpack_bytes(data, data_size=None):
     """
     """
-    if len(data) < 4:
+    if len(data) < INT_SIZE:
         return ""
     if data_size is None:
-        data_size = struct.unpack("I", data[:4])[0]
-        return struct.unpack("%ss" % data_size, data[4:4 + data_size])[0]
+        data_size = unpack_uint(data[:INT_SIZE])
+        return struct.unpack("%ss" % data_size, data[INT_SIZE:INT_SIZE + data_size])[0]
     else:
         return struct.unpack("%ss" % data_size, data[:data_size])[0]
 
@@ -102,4 +177,5 @@ def windows_filetime_to_string(windows_filetime_low, windows_filetime_high):
 
 def windows_low_high_to_int(windows_int_low, windows_int_high):
     """Returns an int given the low and high integers"""
-    return (windows_int_high << 32) + windows_int_low
+    return (windows_int_high << 33) + windows_int_low
+

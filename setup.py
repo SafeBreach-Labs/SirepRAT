@@ -15,7 +15,7 @@ setuptools.setup(
     url="https://github.com/SafeBreach-Labs/SirepRAT",
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Intended Audience :: Information Technology",
@@ -28,5 +28,5 @@ setuptools.setup(
         "Topic :: System :: System Shells",
         "Topic :: Utilities",
     ],
-    python_requires='==2.7',
+    python_requires='>=3.1',
 )

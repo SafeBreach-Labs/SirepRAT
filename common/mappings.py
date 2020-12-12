@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -38,8 +38,8 @@ Date:       2018-02-04 08:03:08
 
 import types
 
-from enums.CommandType import CommandType
-from enums.ResultRecordType import ResultRecordType
+from .enums.CommandType import CommandType
+from .enums.ResultRecordType import ResultRecordType
 from models import commands
 from models import results
 
@@ -49,7 +49,7 @@ def _load_sirep_commands(module, base_class, type_enum, suffix_length):
     _sirep_commands = {}
     for symbol_name in dir(module):
         symbol = getattr(module, symbol_name)
-        if not isinstance(symbol, (type, types.ClassType)):
+        if not isinstance(symbol, type):
             continue
         # fill only classes that derive from given base class
         if issubclass(symbol, base_class) and \

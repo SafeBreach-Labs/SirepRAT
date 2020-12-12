@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -36,7 +36,7 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-from SirepResult import SirepResult
+from .SirepResult import SirepResult
 from common.constants import INT_SIZE
 
 

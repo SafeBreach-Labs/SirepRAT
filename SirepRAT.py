@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -41,7 +41,6 @@ import argparse
 import logging
 import socket
 import string
-import struct
 import sys
 
 import hexdump
@@ -50,6 +49,7 @@ from common.constants import SIREP_VERSION_GUID_LEN, LOGGING_FORMAT, LOGGING_LEV
     LOGGING_DATA_TRUNCATION
 from common.enums.CommandType import CommandType
 from common.mappings import SIREP_COMMANDS, RESULT_TYPE_TO_RESULT
+from common.utils import unpack_uint
 
 # Initialize logging
 logging.basicConfig(format=LOGGING_FORMAT, level=LOGGING_LEVEL)
@@ -93,18 +93,18 @@ def sirep_connect(sock, dst_ip, verbose=False):
     sock.connect(server_address)
     # Receive the server version GUID that acts as the service banner
     version_guid_banner = sock.recv(SIREP_VERSION_GUID_LEN)
-    logging.info('Banner hex: %s' % version_guid_banner)
+    logging.info('Banner hex: %s' % version_guid_banner.hex())
     if verbose:
-        print "RECV:"
+        print("RECV:")
         hexdump.hexdump(version_guid_banner)
 
 
 def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False, verbose=False):
     # generate the commands's payload
     sirep_payload = sirep_command.serialize_sirep()
-    logging.info('Sirep payload hex: %s' % sirep_payload.encode('hex'))
+    logging.info('Sirep payload hex: %s' % sirep_payload.hex())
     if verbose:
-        print "SEND:"
+        print("SEND:")
         hexdump.hexdump(sirep_payload)
 
     # Send the Sirep payload
@@ -116,27 +116,32 @@ def sirep_send_command(sirep_con_sock, sirep_command, print_printable_data=False
     records = []
     while True:
         try:
-            first_int = sirep_con_sock.recv(0x4)
-            if first_int == '':
+            first_int = sirep_con_sock.recv(INT_SIZE)
+            if not first_int:
                 break
-            result_record_type = int(struct.unpack("I", first_int)[0])
+            result_record_type = unpack_uint(first_int)
             logging.debug("Result record type: %d" % result_record_type)
-            data_size = int(struct.unpack("I", sirep_con_sock.recv(0x4))[0])
-            if data_size == 0:
+            data_size = unpack_uint(sirep_con_sock.recv(INT_SIZE))
+            if not data_size:
                 break
 
             logging.debug("Receiving %d bytes" % data_size)
             data = sirep_con_sock.recv(data_size)
 
-            logging.info("Result record data hex: %s" % data[:LOGGING_DATA_TRUNCATION].encode('hex'))
+            logging.info("Result record data hex: %s" % data[:LOGGING_DATA_TRUNCATION].hex())
             if verbose:
-                print "RECV:"
+                print("RECV:")
                 hexdump.hexdump(data)
 
             # If printable, print result record data as is
-            if print_printable_data and all([x in string.printable for x in data]):
-                logging.info("Result data readable print:")
-                print "---------\n%s\n---------" % data
+            if print_printable_data:
+                try:
+                    data_string = data.decode()
+                    logging.info("Result data readable print:")
+                    print("---------\n%s\n---------" % data_string)
+                except UnicodeError:
+                    pass
+
             records.append(first_int + data)
         except socket.timeout as e:
             logging.debug("timeout in command communication. Assuming end of conversation")
@@ -171,13 +176,12 @@ def main(args):
         sirep_result_buffers = sirep_send_command(sock, sirep_command, print_printable_data=args.v or args.vv,
                                                   verbose=args.vv)
 
-        sirep_results = []
         for result_buffer in sirep_result_buffers:
-            result_type_code = struct.unpack("I", result_buffer[:INT_SIZE])[0]
+            result_type_code = unpack_uint(result_buffer[:INT_SIZE])
             sirep_result_ctor = RESULT_TYPE_TO_RESULT[result_type_code]
             sirep_result = sirep_result_ctor(result_buffer)
-            print sirep_result
-            sirep_results.append(sirep_result)
+            print(sirep_result)
+
     finally:
         logging.debug("Closing socket")
         sock.close()
@@ -224,7 +228,7 @@ if "__main__" == __name__:
                         help="Verbose - if printable, print result")
     parser.add_argument('--vv', action='store_true', default=False,
                         help="Very verbose - print socket buffers and more")
-    
+
     args = parser.parse_args()
 
     if args.command_type == CommandType.LaunchCommandWithOutput.name:

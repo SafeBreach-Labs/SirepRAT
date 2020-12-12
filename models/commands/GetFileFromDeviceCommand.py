@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -36,10 +36,8 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
-
 import common.utils as utils
-from SirepCommand import SirepCommand
+from .SirepCommand import SirepCommand
 from common.constants import INT_SIZE
 from common.enums.CommandType import CommandType
 
@@ -59,19 +57,17 @@ class GetFileFromDeviceCommand(SirepCommand):
 
         The payload length for this command type is the unicode length of the remote path.
         """
-        return len(self.remote_path) * 2
+        return 2*len(self.remote_path)
 
     def serialize_sirep(self):
         """Described in parent class"""
-        serialized = ""
-        # serialize the command global headers
-        serialized += struct.pack("II", self.command_type.value, self.payload_length)
-        # serialize the remote path parameter
-        serialized += utils.pack_string(self.remote_path)
-        return serialized
+        return b''.join((
+            utils.pack_uint(self.command_type.value),
+            utils.pack_string(self.remote_path),
+            ))
 
     @staticmethod
     def deserialize_sirep(self, command_buffer):
         """Described in parent class"""
-        remote_path = utils.unpack_string(command_buffer[INT_SIZE * 2:])
+        remote_path = utils.unpack_string(command_buffer[2*INT_SIZE:])
         return GetFileFromDeviceCommand(remote_path)

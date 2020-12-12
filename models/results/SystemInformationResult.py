@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -38,7 +38,7 @@ Date:       2018-02-04 08:03:08
 
 import struct
 
-from SirepResult import SirepResult
+from .SirepResult import SirepResult
 from common.constants import OS_VERSION_INFO_EX_SIZE
 
 

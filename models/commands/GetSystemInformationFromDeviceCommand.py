@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -36,7 +36,7 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-from SirepCommand import SirepCommand
+from .SirepCommand import SirepCommand
 from common.enums.CommandType import CommandType
 
 

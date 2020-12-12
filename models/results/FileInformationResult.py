@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 BSD 3-Clause License
 
@@ -36,10 +36,8 @@ Author:     Dor Azouri <dor.azouri@safebreach.com>
 Date:       2018-02-04 08:03:08
 """
 
-import struct
-
 import common.utils as utils
-from SirepResult import SirepResult
+from .SirepResult import SirepResult
 from common.constants import FILE_INFORMATION_SIZE
 
 
@@ -66,7 +64,7 @@ class FileInformationResult(SirepResult):
         dwHighDateTime_LastAccess, \
         dwLowDateTime_LastWrite, \
         dwHighDateTime_LastWrite = \
-            struct.unpack("IIIIIIIIII", result_payload[:FILE_INFORMATION_SIZE])
+            utils.unpack_uints(result_payload[:FILE_INFORMATION_SIZE])
         if HResult == 0x0:
             kv['file_size'] = utils.windows_low_high_to_int(nFileSizeLow, nFileSizeHigh)
             kv['time_created'] = utils.windows_filetime_to_string(dwLowDateTime_Created, dwHighDateTime_Created)
